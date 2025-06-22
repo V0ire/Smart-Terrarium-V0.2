@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="english">
+  <head>
+    <title>Threshold Settings - Smart Terrarium</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta property="twitter:card" content="summary_large_image" />
+
+    <style data-tag="reset-style-sheet">
+      html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;  -webkit-font-smoothing: antialiased;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6,figure,blockquote,figcaption {  margin: 0;  padding: 0;}button {  background-color: transparent;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="submit"] {  -webkit-appearance: button; appearance: button;  color: inherit;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner {  border-style: none;  padding: 0;}button:-moz-focus,[type="button"]:-moz-focus,[type="reset"]:-moz-focus,[type="submit"]:-moz-focus {  outline: 1px dotted ButtonText;}a {  color: inherit;  text-decoration: inherit;}input {  padding: 2px 4px;}img {  display: block;}details {  display: block;  margin: 0;  padding: 0;}summary::-webkit-details-marker {  display: none;}[data-thq="accordion"] [data-thq="accordion-content"] {  max-height: 0;  overflow: hidden;  transition: max-height 0.3s ease-in-out;  padding: 0;}[data-thq="accordion"] details[data-thq="accordion-trigger"][open] + [data-thq="accordion-content"] {  max-height: 1000vh;}details[data-thq="accordion-trigger"][open] summary [data-thq="accordion-icon"] {  transform: rotate(180deg);}html { scroll-behavior: smooth  }
+    </style>
+    <style data-tag="default-style-sheet">
+      html {
+        font-family: Inter;
+        font-size: 16px;
+      }
+
+      body {
+        font-weight: 400;
+        font-style:normal;
+        text-decoration: none;
+        text-transform: none;
+        letter-spacing: normal;
+        line-height: 1.15;
+        color: var(--dl-color-theme-neutral-dark);
+        background: var(--dl-color-theme-neutral-light);
+
+        fill: var(--dl-color-theme-neutral-dark);
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/animate.css@4.1.1/animate.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='threshold.css') }}" />
+  </head>
+  <body>
+    <div>
+      <div class="threshold-container1">
+        <div class="threshold-threshold">
+          <header class="threshold-header">
+            <div class="threshold-component1">
+              <div class="threshold-frame1">
+                <div class="threshold-temppreferenceseco1">
+                  <img
+                    src="{{ url_for('static', filename='assets/temppreferencesecoi679-i78o.svg') }}"
+                    alt="Smart Terrarium Logo"
+                    class="threshold-temppreferenceseco2"
+                  />
+                </div>
+                <span class="threshold-text10">Smart Terrarium</span>
+              </div>
+              <nav class="threshold-navigation">
+                <a href="{{ url_for('home') }}" class="threshold-text11">Home</a>
+                <a href="{{ url_for('threshold') }}" class="threshold-text12 active">Threshold</a>
+              </nav>
+            </div>
+          </header>
+          <section class="threshold-overview">
+            <div class="threshold-deceased1">
+              <img
+                src="{{ url_for('static', filename='assets/deceasedi862-53sp.svg') }}"
+                alt="Condition Icon"
+                class="threshold-deceased2"
+              />
+            </div>
+            <div class="threshold-frame3">
+              <span class="threshold-text14">
+                <span class="threshold-text15">Terrarium Condition is</span>
+                <span class="threshold-text16">Optimal</span>
+                <br />
+                <span>your terrarium is good, no need to do anything.</span>
+              </span>
+            </div>
+          </section>
+          <main class="threshold-frame19">
+            <div class="threshold-container2">
+              <div class="threshold-frame10">
+                <div class="threshold-sensor-reading1">
+                  <img
+                    src="{{ url_for('static', filename='assets/carbonsoilmoisture6782-9b1q.svg') }}"
+                    alt="Soil Moisture Icon"
+                    class="threshold-carbonsoilmoisture"
+                  />
+                  <span class="threshold-text19">Soil Moisture Threshold</span>
+                </div>
+                <div class="threshold-card-container1">
+                  <div class="threshold-icon1">
+                    <div class="threshold-frame181">
+                      <span class="threshold-text20">Quick Set:</span>
+                    </div>
+                    <div class="threshold-soil-moisture1">
+                      <button class="threshold-frame141">
+                        <span class="threshold-text21">Low(0% - 30%)</span>
+                      </button>
+                      <button class="threshold-frame151">
+                        <span class="threshold-text22">Medium(30% - 60%)</span>
+                      </button>
+                      <button class="threshold-frame161">
+                        <span class="threshold-text23">Hard(60% - 70%)</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="threshold-frame13">
+                <div class="threshold-sensor-reading2">
+                  <div class="threshold-cookie1">
+                    <img
+                      src="{{ url_for('static', filename='assets/cookie8317-g0u8.svg') }}"
+                      alt="Isopods Icon"
+                      class="threshold-cookie2"
+                    />
+                  </div>
+                  <span class="threshold-text24">Daily Isopods Feeding</span>
+                </div>
+                <div class="threshold-card-container2">
+                  <div class="threshold-icon2">
+                    <div class="threshold-frame182">
+                      <span class="threshold-text25">Quick Set:</span>
+                      <div class="threshold-humidity1">
+                        <div class="threshold-soil-moisture2">
+                          <button class="threshold-frame142">
+                            <span class="threshold-text26">Low(0% - 30%)</span>
+                          </button>
+                          <button class="threshold-frame152">
+                            <span class="threshold-text27">
+                              Medium(30% - 60%)
+                            </span>
+                          </button>
+                          <button class="threshold-frame162">
+                            <span class="threshold-text28">
+                              Hard(60% - 70%)
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="threshold-container3">
+              <div class="threshold-frame12">
+                <div class="threshold-sensor-reading3">
+                  <div class="threshold-wbincandescent1">
+                    <img
+                      src="{{ url_for('static', filename='assets/wbincandescent8317-kw4.svg') }}"
+                      alt="Light Icon"
+                      class="threshold-wbincandescent2"
+                    />
+                  </div>
+                  <span class="threshold-text29">Light Density Threshold</span>
+                </div>
+                <div class="threshold-card-container3">
+                  <div class="threshold-icon3">
+                    <div class="threshold-frame183">
+                      <span class="threshold-text30">Quick Set:</span>
+                      <div class="threshold-humidity2">
+                        <div class="threshold-soil-moisture3">
+                          <button class="threshold-frame143">
+                            <span class="threshold-text31">Low(0% - 30%)</span>
+                          </button>
+                          <button class="threshold-frame153">
+                            <span class="threshold-text32">
+                              Medium(30% - 60%)
+                            </span>
+                          </button>
+                          <button class="threshold-frame163">
+                            <span class="threshold-text33">
+                              Hard(60% - 70%)
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="threshold-frame11">
+                <div class="threshold-sensor-reading4">
+                  <div class="threshold-aqindoor1">
+                    <img
+                      src="{{ url_for('static', filename='assets/aqindoor8314-o67m.svg') }}"
+                      alt="Humidity Icon"
+                      class="threshold-aqindoor2"
+                    />
+                  </div>
+                  <span class="threshold-text34">Humidity Threshold</span>
+                </div>
+                <div class="threshold-card-container4">
+                  <div class="threshold-icon4">
+                    <div class="threshold-frame184">
+                      <span class="threshold-text35">Quick Set:</span>
+                      <div class="threshold-humidity3">
+                        <div class="threshold-soil-moisture4">
+                          <button class="threshold-frame144">
+                            <span class="threshold-text36">Low(0% - 30%)</span>
+                          </button>
+                          <button class="threshold-frame154">
+                            <span class="threshold-text37">
+                              Medium(30% - 60%)
+                            </span>
+                          </button>
+                          <button class="threshold-frame164">
+                            <span class="threshold-text38">
+                              Hard(60% - 70%)
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

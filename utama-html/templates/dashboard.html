@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="english">
+  <head>
+    <title>Smart Terrarium Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta property="twitter:card" content="summary_large_image" />
+
+    <style data-tag="reset-style-sheet">
+      html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;  -webkit-font-smoothing: antialiased;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6,figure,blockquote,figcaption {  margin: 0;  padding: 0;}button {  background-color: transparent;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="submit"] {  -webkit-appearance: button; appearance: button;  color: inherit;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner {  border-style: none;  padding: 0;}button:-moz-focus,[type="button"]:-moz-focus,[type="reset"]:-moz-focus,[type="submit"]:-moz-focus {  outline: 1px dotted ButtonText;}a {  color: inherit;  text-decoration: inherit;}input {  padding: 2px 4px;}img {  display: block;}details {  display: block;  margin: 0;  padding: 0;}summary::-webkit-details-marker {  display: none;}[data-thq="accordion"] [data-thq="accordion-content"] {  max-height: 0;  overflow: hidden;  transition: max-height 0.3s ease-in-out;  padding: 0;}[data-thq="accordion"] details[data-thq="accordion-trigger"][open] + [data-thq="accordion-content"] {  max-height: 1000vh;}details[data-thq="accordion-trigger"][open] summary [data-thq="accordion-icon"] {  transform: rotate(180deg);}html { scroll-behavior: smooth  }
+    </style>
+    <style data-tag="default-style-sheet">
+      html {
+        font-family: Inter;
+        font-size: 16px;
+      }
+
+      body {
+        font-weight: 400;
+        font-style:normal;
+        text-decoration: none;
+        text-transform: none;
+        letter-spacing: normal;
+        line-height: 1.15;
+        color: var(--dl-color-theme-neutral-dark);
+        background: var(--dl-color-theme-neutral-light);
+
+        fill: var(--dl-color-theme-neutral-dark);
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/animate.css@4.1.1/animate.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
+  </head>
+  <body>
+    <div>
+      <div class="dashboard-container1">
+        <div class="dashboard-dashboard">
+          <header class="dashboard-header">
+            <div class="dashboard-component1">
+              <div class="dashboard-frame1">
+                <div class="dashboard-temppreferenceseco1">
+                  <img
+                    src="{{ url_for('static', filename='assets/temppreferenceseco2970-kxu.svg') }}"
+                    alt="Smart Terrarium Logo"
+                    class="dashboard-temppreferenceseco2"
+                  />
+                </div>
+                <span class="dashboard-text10">Smart Terrarium</span>
+              </div>
+              <nav class="dashboard-navigation">
+                <a href="{{ url_for('home') }}" class="dashboard-text11">Home</a>
+                <a href="{{ url_for('threshold') }}" class="dashboard-text12">Threshold</a>
+              </nav>
+            </div>
+          </header>
+
+          <section class="dashboard-overview">
+            <div class="dashboard-deceased1">
+              <img
+                src="{{ url_for('static', filename='assets/deceasedi862-8p2p.svg') }}"
+                alt="Condition Icon"
+                class="dashboard-deceased2"
+              />
+            </div>
+            <div class="dashboard-frame3">
+              <p class="dashboard-text14" id="terrarium-message-full">
+                <span class="dashboard-text15">Terrarium Condition is </span>
+                <span class="dashboard-text16" id="terrarium-condition">Optimal</span>
+                <br />
+                <span id="terrarium-message">your terrarium is good, no need to do anything.</span>
+              </p>
+            </div>
+          </section>
+
+          <section class="dashboard-sensor-reading1">
+            <div class="dashboard-sensor-reading2">
+              <div class="dashboard-resetwrench1">
+                <img
+                  src="{{ url_for('static', filename='assets/resetwrench5275-jy9l.svg') }}"
+                  alt="Sensor Icon"
+                  class="dashboard-resetwrench2"
+                />
+              </div>
+              <span class="dashboard-text19">Sensor Reading</span>
+            </div>
+            <div class="dashboard-card-container1">
+              <div class="dashboard-framesoilmoisture">
+                <div class="dashboard-icon1">
+                  <img
+                    src="{{ url_for('static', filename='assets/carbonsoilmoisture5488-qgyc.svg') }}"
+                    alt="Soil Moisture Icon"
+                    class="dashboard-carbonsoilmoisture"
+                  />
+                  <span class="dashboard-text20">Soil Moisture</span>
+                </div>
+                <div class="dashboard-data1">
+                  <span class="dashboard-text21" id="soil-moisture-percent">--</span>
+                  <span class="dashboard-text22" id="soil-status">--</span>
+                </div>
+              </div>
+              <div class="dashboard-framehumidity">
+                <div class="dashboard-icon2">
+                    <img
+                      src="{{ url_for('static', filename='assets/aqindoor5410-f5sj.svg') }}"
+                      alt="Humidity Icon"
+                      class="dashboard-aqindoor2"
+                    />
+                  <span class="dashboard-text23">Humidity</span>
+                </div>
+                <div class="dashboard-data2">
+                  <span class="dashboard-text24" id="humidity-value">--</span>
+                  <span class="dashboard-text25" id="humidity-status">--</span>
+                </div>
+              </div>
+              <div class="dashboard-frametemperature">
+                <div class="dashboard-icon3">
+                    <img
+                      src="{{ url_for('static', filename='assets/devicethermostat5410-craa.svg') }}"
+                      alt="Temperature Icon"
+                      class="dashboard-devicethermostat2"
+                    />
+                  <span class="dashboard-text26">Temperature</span>
+                </div>
+                <div class="dashboard-data3">
+                  <span class="dashboard-text27" id="temp-value">--</span>
+                  <span class="dashboard-text28" id="temp-status">--</span>
+                </div>
+              </div>
+              <div class="dashboard-light-intensity">
+                <div class="dashboard-icon4">
+                    <img
+                      src="{{ url_for('static', filename='assets/wbsunny5410-hcxk.svg') }}"
+                      alt="Light Intensity Icon"
+                      class="dashboard-wbsunny2"
+                    />
+                  <span class="dashboard-text29">Light Intensity</span>
+                </div>
+                <div class="dashboard-data4">
+                  <span class="dashboard-text30" id="light-value">--</span>
+                  <span class="dashboard-text31" id="light-status">--</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="dashboard-actuator">
+            <div class="dashboard-sensor-reading3">
+              <span class="dashboard-text32">Actuator</span>
+              <img
+                src="{{ url_for('static', filename='assets/ixmachinec5763-hsj.svg') }}"
+                alt="Actuator Icon"
+                class="dashboard-ixmachinec"
+              />
+            </div>
+            <div class="dashboard-card-container2">
+              <div class="dashboard-soil-moisture">
+                <div class="dashboard-icon5">
+                  <img
+                    src="{{ url_for('static', filename='assets/mdiwateringcanoutline5767-hqtq.svg') }}"
+                    alt="Watering Can Icon"
+                    class="dashboard-mdiwateringcanoutline"
+                  />
+                  <span class="dashboard-text33">Watering Plant</span>
+                </div>
+                <div class="dashboard-container2">
+                  <button id="manual-water-btn" class="dashboard-manual-water">
+                    <span class="dashboard-text34">Turn on Manual</span>
+                  </button>
+                  <button id="auto-water-btn" class="dashboard-automatic-water">
+                    <span class="dashboard-text35">Automatic Water</span>
+                  </button>
+                </div>
+              </div>
+              <div class="dashboard-humidty">
+                <div class="dashboard-icon6">
+                    <img
+                      src="{{ url_for('static', filename='assets/wbincandescent5777-v23r.svg') }}"
+                      alt="Lamp Icon"
+                      class="dashboard-wbincandescent2"
+                    />
+                  <span class="dashboard-text36">Lamp</span>
+                </div>
+                <div class="dashboard-frame20">
+                  <div class="dashboard-container4">
+                    <button class="dashboard-data8" id="all-lamp-btn">
+                      <span class="dashboard-text40">All Lamp</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="dashboard-temperature">
+                <div class="dashboard-icon7">
+                    <img
+                      src="{{ url_for('static', filename='assets/cookie5792-bko5.svg') }}"
+                      alt="Feed Icon"
+                      class="dashboard-cookie2"
+                    />
+                  <span class="dashboard-text41">Feed Isopods</span>
+                </div>
+                <button class="dashboard-data9" id="feed-btn">
+                  <span class="dashboard-text42">Feed</span>
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
