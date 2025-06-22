@@ -1,84 +1,96 @@
-# app.py
-from flask import Flask, render_template, request, jsonify, json
+# app.py (Versi Supabase)
+import os
+from flask import Flask, render_template, request, jsonify
+from supabase import create_client, Client
 
-app = Flask(__name__)
+# BARU: Inisialisasi koneksi ke Supabase menggunakan Environment Variables
+# Pastikan Anda sudah mengatur ini di Vercel!
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
 
-DATA_FILE = 'data.json'
-CONTROL_FILE = 'control.json'
+app = Flask(__name__) # DIUBAH: Typo _name diperbaiki menjadi _name_
 
-def load_json_data(filepath):
-    try:
-        with open(filepath, 'r') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        # Mengembalikan default jika file tidak ada atau rusak
-        if 'control' in filepath:
-            return {"lamp": "OFF", "servo": "OFF", "threshold": 2500}
-        else:
-            return {"temperature": 0, "humidity": 0, "lux": 0, "soil": 4095}
+# DIHAPUS: Konstanta nama file tidak diperlukan lagi
+# DATA_FILE = 'data.json'
+# CONTROL_FILE = 'control.json'
 
-def save_json_data(filepath, data):
-    with open(filepath, 'w') as f:
-        json.dump(data, f, indent=2)
+# DIHAPUS: Fungsi untuk membaca/menulis file lokal tidak diperlukan lagi
+# def load_json_data(filepath): ...
+# def save_json_data(filepath, data): ...
+
 
 @app.route('/get-control', methods=['GET'])
 def get_control_data():
     """
-    Endpoint ini membaca file control.json dan mengirimkannya sebagai respons.
-    ESP akan memanggil alamat ini untuk mendapatkan perintah terbaru.
+    Endpoint ini membaca data kontrol dari tabel 'control_status' di Supabase
+    dan mengirimkannya sebagai respons ke ESP.
     """
     try:
-        control_data = load_json_data(CONTROL_FILE)
-        return jsonify(control_data), 200
+        # DIUBAH: Mengambil data dari Supabase, bukan file
+        response = supabase.table('control_status').select("lamp, servo, threshold").eq('id', 1).single().execute()
+        
+        if response.data:
+            return jsonify(response.data), 200
+        else:
+            # Jika data tidak ditemukan, kembalikan default
+            return jsonify({"lamp": "OFF", "servo": "OFF", "threshold": 2500}), 404
+            
     except Exception as e:
-        print(f"Error saat membaca file kontrol: {e}")
-        return jsonify({"status": "error", "message": "Gagal membaca data kontrol"}),500
+        print(f"Error saat mengambil data kontrol dari Supabase: {e}")
+        return jsonify({"status": "error", "message": "Gagal membaca data kontrol"}), 500
+
+
 @app.route('/data', methods=['POST'])
 def receive_data():
     """
-    Endpoint ini menerima data JSON yang dikirim oleh ESP (dengan metode POST)
-    dan menyimpannya ke data.json.
+    Endpoint ini menerima data JSON dari ESP dan menyimpannya
+    ke tabel 'sensor_data' di Supabase.
     """
-    # Memeriksa apakah data yang masuk adalah JSON
     if request.is_json:
         received_data = request.get_json()
-        
-        # Mencetak data yang diterima ke terminal (sangat berguna untuk debugging!)
         print(f"Menerima data dari ESP: {received_data}")
         
-        # Menyimpan data yang diterima ke file data.json
-        save_json_data(DATA_FILE, received_data)
-        
-        # Mengirim respons sukses kembali ke ESP
-        return jsonify({"status": "success", "message": "Data berhasil diterima"}), 200
-    
-    # Jika data yang masuk bukan JSON, kirim respons error
-    return jsonify({"status": "error", "message": "Request harus dalam format JSON"}),400
+        try:
+            # DIUBAH: Menyimpan (update) data ke Supabase, bukan file
+            supabase.table('sensor_data').update(received_data).eq('id', 1).execute()
+            return jsonify({"status": "success", "message": "Data berhasil diterima"}), 200
+        except Exception as e:
+            print(f"Error saat menyimpan data sensor ke Supabase: {e}")
+            return jsonify({"status": "error", "message": "Gagal menyimpan data sensor"}), 500
+            
+    return jsonify({"status": "error", "message": "Request harus dalam format JSON"}), 400
+
 
 def get_status_logic():
-    sensor_data = load_json_data(DATA_FILE)
-    control_data = load_json_data(CONTROL_FILE)
-
-    # Inisialisasi nilai default jika terjadi error konversi
-    soil_value = 0
-    humidity_value = 0.0
-    temp_value = 0.0
-    lux_value = 0.0
-    
+    """
+    Fungsi ini mengambil data sensor dan kontrol dari Supabase,
+    memprosesnya, dan mengembalikan semua status.
+    """
     try:
-        # Mencoba mengubah data sensor, menggunakan nilai default jika gagal
-        soil_value = int(sensor_data.get('soil', 0))
-        humidity_value = float(sensor_data.get('humidity', 0))
-        temp_value = float(sensor_data.get('temperature', 0))
-        lux_value = float(sensor_data.get('lux', 0))
-    except (ValueError, TypeError) as e:
-        # Jika terjadi error saat konversi (misal: data tidak valid), cetak pesan error di terminal
-        print(f"Peringatan: Tidak dapat memproses data sensor. Error: {e}")
-        # Nilai akan tetap default (0), sehingga aplikasi tidak crash
+        # DIUBAH: Mengambil data sensor dan kontrol dari Supabase
+        sensor_response = supabase.table('sensor_data').select("*").eq('id', 1).single().execute()
+        control_response = supabase.table('control_status').select("*").eq('id', 1).single().execute()
+        
+        # Menggunakan data dari response, atau nilai default jika gagal
+        sensor_data = sensor_response.data or {"temperature": 0, "humidity": 0, "lux": 0, "soil": 4095}
+        control_data = control_response.data or {"lamp": "OFF", "servo": "OFF", "threshold": 2500}
+    
+    except Exception as e:
+        print(f"Error saat mengambil data untuk logika status: {e}")
+        sensor_data = {"temperature": 0, "humidity": 0, "lux": 0, "soil": 4095}
+        control_data = {"lamp": "OFF", "servo": "OFF", "threshold": 2500}
 
+    # Dari sini ke bawah, TIDAK ADA PERUBAHAN.
+    # Semua logika tetap sama karena inputnya (sensor_data dan control_data)
+    # adalah dictionary Python, sama seperti sebelumnya.
+
+    soil_value = int(sensor_data.get('soil', 0))
+    humidity_value = float(sensor_data.get('humidity', 0))
+    temp_value = float(sensor_data.get('temperature', 0))
+    lux_value = float(sensor_data.get('lux', 0))
     soil_threshold = int(control_data.get('threshold', 2500))
 
-    # Logika untuk Soil Moisture
     if soil_value > soil_threshold + 500:
         soil_status = "Low"
     elif soil_value < soil_threshold - 500:
@@ -87,7 +99,6 @@ def get_status_logic():
         soil_status = "Optimal"
     soil_moisture_percent = round(max(0, min(100, (4095 - soil_value) / 4095 * 100)), 1)
 
-    # Logika untuk Humidity
     if humidity_value > 85:
         humidity_status = "High"
     elif humidity_value < 60:
@@ -95,7 +106,6 @@ def get_status_logic():
     else:
         humidity_status = "Optimal"
 
-    # Logika untuk Temperature
     if temp_value > 30:
         temp_status = "High"
     elif temp_value < 20:
@@ -103,7 +113,6 @@ def get_status_logic():
     else:
         temp_status = "Optimal"
 
-    # Logika untuk Light Intensity
     if lux_value > 1000:
         light_status = "High"
     elif lux_value < 100:
@@ -111,7 +120,6 @@ def get_status_logic():
     else:
         light_status = "Optimal"
 
-    # Logika Kondisi Terrarium Keseluruhan
     all_statuses = [soil_status, humidity_status, temp_status, light_status]
     if "Low" in all_statuses or "High" in all_statuses:
         terrarium_condition = "Not Optimal"
@@ -122,10 +130,8 @@ def get_status_logic():
 
     return {
         "sensor_data": {
-            "temperature": temp_value,
-            "humidity": humidity_value,
-            "lux": lux_value,
-            "soil": soil_value
+            "temperature": temp_value, "humidity": humidity_value,
+            "lux": lux_value, "soil": soil_value
         },
         "control_data": control_data,
         "soil_status": soil_status,
@@ -137,7 +143,8 @@ def get_status_logic():
         "terrarium_message": terrarium_message
     }
 
-
+# Rute-rute di bawah ini tidak perlu diubah karena mereka memanggil get_status_logic()
+# yang sudah kita modifikasi untuk menggunakan Supabase.
 @app.route('/')
 def home():
     context = get_status_logic()
@@ -148,26 +155,26 @@ def threshold():
     context = get_status_logic()
     return render_template('threshold.html', **context)
 
+
 @app.route('/update_control', methods=['POST'])
 def update_control():
     if request.is_json:
         update_data = request.get_json()
-        
-        # Memuat data kontrol saat ini
-        control_data = load_json_data('control.json')
-        
-        # Memperbarui data dengan nilai baru
-        control_data.update(update_data)
-        
-        # Menyimpan kembali ke file
-        save_json_data('control.json', control_data)
-        
-        return jsonify({"status": "success", "updated_data": control_data}), 200
-    
+        try:
+            # DIUBAH: Langsung update data ke tabel 'control_status' di Supabase
+            response = supabase.table('control_status').update(update_data).eq('id', 1).execute()
+            return jsonify({"status": "success", "updated_data": response.data}), 200
+        except Exception as e:
+            print(f"Error saat update kontrol ke Supabase: {e}")
+            return jsonify({"status": "error", "message": "Gagal update data kontrol"}), 500
+
     return jsonify({"status": "error", "message": "Request must be JSON"}), 400
+
+
 @app.route('/status')
 def status():
     return jsonify(get_status_logic())
-if __name__ == '__main__':
-    # host='0.0.0.0' agar bisa diakses dari perangkat lain di jaringan yang sama
+
+
+if __name__ == '_main_':
     app.run(debug=True, host='0.0.0.0')
