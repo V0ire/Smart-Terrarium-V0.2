@@ -1,5 +1,9 @@
 {
-  "lamp": "ON",
-  "servo": "OFF",
-  "threshold": 2500
+  "auto_water_mode": "OFF",
+  "humidity_threshold": 60,
+  "lamp": "AUTO",
+  "light_threshold": 50,
+  "servo": "ON",
+  "servo_threshold": 2,
+  "soil_threshold": 1800
 }

@@ -1048,3 +1048,8 @@
     /* Memberi efek tombol ditekan */
     transform: scale(0.98);
 }
+.button-active {
+    background-color: #007bff !important;
+    color: white !important;
+    border-color: #0056b3 !important;
+}

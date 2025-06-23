@@ -7,131 +7,237 @@
 #include <ESP32Servo.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "KulkasLG2PintuMinatInbok";
-const char* password = "suprijoker";
-const char* serverHost = "http://192.168.43.205:5000";
+// --- KONFIGURASI YANG PERLU ANDA UBAH ---
+const char* WIFI_SSID = "KulkasLG2PintuMinatInbok"; // DIUBAH: Sesuai permintaan Anda
+const char* WIFI_PASSWORD = "suprijoker";  // DIUBAH: Sesuai permintaan Anda
 
+// GANTI DENGAN URL APLIKASI VERCEL ANDA (HARUS LENGKAP dengan https://)
+const char* VERCEL_URL = "https://smart-terarium-v0-1-inb1.vercel.app"; 
+// --- AKHIR DARI KONFIGURASI ---
+
+// Inisialisasi Sensor dan Aktuator
 Adafruit_AHTX0 aht20;
 Adafruit_BMP280 bmp280;
 BH1750 lightMeter;
 Servo myServo;
 
-#define RELAY1_PIN 26
-#define RELAY2_PIN 27
+// Definisi Pin
+#define RELAY1_PIN 26 // Lampu
+#define RELAY2_PIN 27 // Pompa
 #define SOIL_PIN 34
 #define SERVO_PIN 25
 
+// Variabel Global untuk Status
 String lampMode = "OFF";
-int soilThreshold = 2100;
+String pumpMode = "AUTO"; // Variabel untuk mode pompa (AUTO, OFF)
+int soilThreshold = 2000;
+int lightThreshold = 15;
+
+// Pewaktu non-blocking untuk loop yang lebih efisien
+unsigned long lastControlCheck = 0;
+unsigned long lastSensorSend = 0;
+const long controlCheckInterval = 1000;  // Cek perintah setiap 1 detik
+const long sensorSendInterval = 2000; // Kirim data sensor setiap 2 detik
 
 void setup() {
   Serial.begin(115200);
 
-  WiFi.begin(ssid, password);
+  // Koneksi WiFi
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Menghubungkan ke WiFi '");
+  Serial.print(WIFI_SSID);
+  Serial.print("'...");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500); Serial.print(".");
   }
-  Serial.println("\nWiFi Terhubung: " + WiFi.localIP().toString());
+  Serial.println("\n----------------------------------------");
+  Serial.println("WiFi Terhubung!");
+  Serial.print("Alamat IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.println("----------------------------------------");
 
+
+  // Inisialisasi Pin
   pinMode(RELAY1_PIN, OUTPUT);
   pinMode(RELAY2_PIN, OUTPUT);
-  digitalWrite(RELAY1_PIN, LOW);
-  digitalWrite(RELAY2_PIN, LOW);
+  digitalWrite(RELAY1_PIN, LOW); // Pastikan lampu mati saat start
+  digitalWrite(RELAY2_PIN, LOW); // Pastikan pompa mati saat start
 
+  // Inisialisasi Servo
   myServo.attach(SERVO_PIN);
-  myServo.write(90);
+  myServo.write(90); // Posisi default
 
+  // Inisialisasi Sensor I2C
   Wire.begin();
-  if (!aht20.begin()) Serial.println("AHT20 gagal");
-  if (!bmp280.begin(0x77)) Serial.println("BMP280 gagal");
-  if (!lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) Serial.println("BH1750 gagal");
+  if (!aht20.begin()) Serial.println("AHT20 gagal diinisialisasi");
+  if (!bmp280.begin(0x77)) Serial.println("BMP280 gagal diinisialisasi (cek alamat I2C)"); // DIUBAH: Alamat ke 0x77
+  if (!lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) Serial.println("BH1750 gagal diinisialisasi");
 }
 
-void checkControlFromServer() {
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(String(serverHost) + "/get-control");
-    int httpCode = http.GET();
+void getControlData() {
+  if (WiFi.status() != WL_CONNECTED) return;
 
-    if (httpCode == 200) {
-      String payload = http.getString();
-      DynamicJsonDocument doc(256);
-      DeserializationError err = deserializeJson(doc, payload);
-      if (err) return;
-
-      String lampCmd = doc["lamp"] | "OFF";
-      String servoCmd = doc["servo"] | "";
-      int newThreshold = doc["threshold"] | soilThreshold;
-
-      lampMode = lampCmd;
-      soilThreshold = newThreshold;
-
-      if (lampCmd == "ON") digitalWrite(RELAY1_PIN, HIGH);
-      else if (lampCmd == "OFF") digitalWrite(RELAY1_PIN, LOW);
-
-      if (servoCmd == "ON") {
-        myServo.write(0);
-        delay(1000);
-        myServo.write(90);
-
-        HTTPClient http2;
-        http2.begin(String(serverHost) + "/control");
-        http2.addHeader("Content-Type", "application/x-www-form-urlencoded");
-        http2.POST("servo=OFF");
-        http2.end();
-      }
+  HTTPClient http;
+  String endpoint = String(VERCEL_URL) + "/get-control";
+  http.begin(endpoint);
+  
+  int httpCode = http.GET();
+  if (httpCode == HTTP_CODE_OK) {
+    String payload = http.getString();
+    // DIUBAH: Ukuran JSON disesuaikan untuk field baru
+    StaticJsonDocument<512> doc;
+    DeserializationError err = deserializeJson(doc, payload);
+    if (err) {
+      Serial.println("Gagal parsing JSON kontrol: " + String(err.c_str()));
+      http.end();
+      return;
     }
-    http.end();
+
+    // Ambil data dari JSON
+    lampMode = doc["lamp"].as<String>();
+    pumpMode = doc["pump_mode"].as<String>();
+    String servoCmd = doc["servo"].as<String>();
+    String pumpTriggerCmd = doc["pump_manual_trigger"].as<String>(); // BARU: Baca perintah pemicu pompa
+    soilThreshold = doc["soil_threshold"]; 
+    lightThreshold = doc["light_threshold"];
+
+    // Logika kontrol lampu langsung (kecuali mode AUTO)
+    if (lampMode == "ON") {
+      digitalWrite(RELAY1_PIN, HIGH);
+    } else if (lampMode == "OFF") {
+      digitalWrite(RELAY1_PIN, LOW);
+    }
+
+    // Logika kontrol servo
+    if (servoCmd == "ON") {
+      Serial.println("Mengaktifkan servo...");
+      myServo.write(0); // Buka
+      delay(1000);
+      myServo.write(90); // Tutup
+
+      HTTPClient httpUpdate;
+      String updateEndpoint = String(VERCEL_URL) + "/update_control";
+      httpUpdate.begin(updateEndpoint);
+      httpUpdate.addHeader("Content-Type", "application/json");
+      StaticJsonDocument<128> updateDoc;
+      updateDoc["servo"] = "OFF";
+      String updatePayload;
+      serializeJson(updateDoc, updatePayload);
+      httpUpdate.POST(updatePayload);
+      httpUpdate.end();
+    }
+    
+    // BARU: Logika untuk pemicu pompa manual sesaat
+    if (pumpTriggerCmd == "ON") {
+      Serial.println("Pemicu Pompa Manual Aktif: Menyalakan pompa selama 2 detik...");
+      digitalWrite(RELAY2_PIN, HIGH);
+      delay(2000); // Nyala selama 2 detik
+      digitalWrite(RELAY2_PIN, LOW);
+      Serial.println("Pompa manual selesai.");
+
+      // Segera kirim balik status "OFF" untuk pemicu agar tidak dijalankan lagi
+      HTTPClient httpUpdate;
+      String updateEndpoint = String(VERCEL_URL) + "/update_control";
+      httpUpdate.begin(updateEndpoint);
+      httpUpdate.addHeader("Content-Type", "application/json");
+      StaticJsonDocument<128> updateDoc;
+      updateDoc["pump_manual_trigger"] = "OFF"; // Setel ulang pemicu
+      String updatePayload;
+      serializeJson(updateDoc, updatePayload);
+      httpUpdate.POST(updatePayload);
+      httpUpdate.end();
+    }
+
+
+  } else {
+    Serial.println("Gagal mengambil data kontrol, HTTP Code: " + String(httpCode));
   }
+  http.end();
+}
+
+void sendSensorData() {
+    if (WiFi.status() != WL_CONNECTED) return;
+
+    // Membaca semua sensor
+    sensors_event_t hum, temp;
+    aht20.getEvent(&hum, &temp);
+    float lux = lightMeter.readLightLevel();
+    int soilVal = analogRead(SOIL_PIN);
+
+    // --- BARU: Log Detail untuk Serial Monitor ---
+    Serial.println("\n--- Pembacaan Sensor ---");
+    Serial.print("Suhu Udara: ");
+    Serial.print(temp.temperature);
+    Serial.println(" C");
+    Serial.print("Kelembaban Udara: ");
+    Serial.print(hum.relative_humidity);
+    Serial.println(" %");
+    Serial.print("Intensitas Cahaya: ");
+    Serial.print(lux);
+    Serial.println(" Lux");
+    Serial.print("Kelembaban Tanah (Nilai ADC): ");
+    Serial.println(soilVal);
+    Serial.println("-------------------------");
+    // --- AKHIR DARI LOG DETAIL ---
+
+    // Logika untuk menentukan status sensor
+
+    StaticJsonDocument<512> doc;
+    doc["temperature"] = temp.temperature;
+    doc["humidity"] = hum.relative_humidity;
+    doc["lux"] = lux;
+    doc["soil"] = soilVal;
+
+    String jsonPayload;
+    serializeJson(doc, jsonPayload);
+
+    // Log data JSON yang akan dikirim
+    Serial.println("Mengirim data JSON ke server:");
+    Serial.println(jsonPayload);
+    
+    HTTPClient http;
+    String endpoint = String(VERCEL_URL) + "/data";
+    http.begin(endpoint);
+    http.addHeader("Content-Type", "application/json");
+    http.POST(jsonPayload);
+    http.end();
 }
 
 void loop() {
-  sensors_event_t hum, temp;
-  aht20.getEvent(&hum, &temp);
-  float lux = lightMeter.readLightLevel();
-  int soilVal = analogRead(SOIL_PIN);
+  unsigned long currentMillis = millis();
 
-  float soilPercent = map(soilVal, 2900, 1400, 0, 100);
-  soilPercent = constrain(soilPercent, 0, 100);
+  // 1. Cek perintah dari server secara berkala
+  if (currentMillis - lastControlCheck >= controlCheckInterval) {
+    lastControlCheck = currentMillis;
+    getControlData();
+  }
 
+  // 2. Kirim data sensor ke server secara berkala
+  if (currentMillis - lastSensorSend >= sensorSendInterval) {
+    lastSensorSend = currentMillis;
+    sendSensorData();
+  }
+  
+  // 3. Jalankan logika lokal berdasarkan mode yang diterima
+  
+  // Logika lampu otomatis
   if (lampMode == "AUTO") {
-    digitalWrite(RELAY1_PIN, lux < 15 ? HIGH : LOW);
+    float lux = lightMeter.readLightLevel();
+    digitalWrite(RELAY1_PIN, lux <= lightThreshold ? HIGH : LOW);
   }
 
-  if (soilVal > soilThreshold + 250) {
-    digitalWrite(RELAY2_PIN, HIGH);
-  } else if (soilVal <= soilThreshold) {
+  // DIUBAH: Logika Pompa hanya untuk mode AUTO dan OFF
+  if (pumpMode == "AUTO") {
+    // Mode Otomatis: kontrol berdasarkan sensor kelembaban tanah
+    int soilVal = analogRead(SOIL_PIN);
+    if (soilVal > soilThreshold) {
+      digitalWrite(RELAY2_PIN, HIGH); // Tanah kering, nyalakan pompa
+    } else {
+      digitalWrite(RELAY2_PIN, LOW);  // Tanah lembab, matikan pompa
+    }
+  } else if (pumpMode == "OFF") {
+    // Mode Manual OFF: paksa pompa untuk selalu mati
     digitalWrite(RELAY2_PIN, LOW);
-  }
-
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(String(serverHost) + "/data");
-    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    String postData = "temp=" + String(temp.temperature) +
-                      "&hum=" + String(hum.relative_humidity) +
-                      "&lux=" + String(lux) +
-                      "&soil=" + String(soilVal) +
-                      "&soil_percent=" + String(soilPercent);
-    http.POST(postData);
-    http.end();
-  }
-
-  checkControlFromServer();
-
-  String lampStatus = digitalRead(RELAY1_PIN) == HIGH ? "ON" : "OFF";
-  String pumpStatus = digitalRead(RELAY2_PIN) == HIGH ? "ON" : "OFF";
-  String servoStatus = "OFF";
-
-  Serial.println("\n WiFi Terhubung: " + WiFi.localIP().toString());
-  Serial.print("\n Lampu: ");
-  Serial.print(lampStatus);
-  Serial.print(" | Pompa: ");
-  Serial.print(pumpStatus);
-  Serial.print(" | Servo: ");
-  Serial.println(servoStatus);
-  Serial.printf("\n T: %.1fC H: %.1f%% Lux: %.1f Soil: %d (%.1f%%)\n", temp.temperature, hum.relative_humidity, lux, soilVal, soilPercent);
-
-  delay(500);
+  } 
+  // DIHAPUS: Kasus "else if (pumpMode == "ON")" dihapus karena digantikan oleh sistem pemicu.
 }

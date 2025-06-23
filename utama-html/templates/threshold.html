@@ -39,6 +39,9 @@
     />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='threshold.css') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap" rel="stylesheet">
   </head>
   <body>
     <div>
@@ -96,13 +99,13 @@
                       <span class="threshold-text20">Quick Set:</span>
                     </div>
                     <div class="threshold-soil-moisture1">
-                      <button class="threshold-frame141">
+                      <button id="soil-low-btn" class="threshold-frame141">
                         <span class="threshold-text21">Low(0% - 30%)</span>
                       </button>
-                      <button class="threshold-frame151">
+                      <button id="soil-medium-btn" class="threshold-frame151">
                         <span class="threshold-text22">Medium(30% - 60%)</span>
                       </button>
-                      <button class="threshold-frame161">
+                      <button id="soil-hard-btn" class="threshold-frame161">
                         <span class="threshold-text23">Hard(60% - 70%)</span>
                       </button>
                     </div>
@@ -126,15 +129,15 @@
                       <span class="threshold-text25">Quick Set:</span>
                       <div class="threshold-humidity1">
                         <div class="threshold-soil-moisture2">
-                          <button class="threshold-frame142">
+                          <button id="isopods-low-btn" class="threshold-frame142">
                             <span class="threshold-text26">Low(0% - 30%)</span>
                           </button>
-                          <button class="threshold-frame152">
+                          <button id="isopods-medium-btn" class="threshold-frame152">
                             <span class="threshold-text27">
                               Medium(30% - 60%)
                             </span>
                           </button>
-                          <button class="threshold-frame162">
+                          <button id="isopods-hard-btn" class="threshold-frame162">
                             <span class="threshold-text28">
                               Hard(60% - 70%)
                             </span>
@@ -164,15 +167,15 @@
                       <span class="threshold-text30">Quick Set:</span>
                       <div class="threshold-humidity2">
                         <div class="threshold-soil-moisture3">
-                          <button class="threshold-frame143">
+                          <button id="light-low-btn" class="threshold-frame143">
                             <span class="threshold-text31">Low(0% - 30%)</span>
                           </button>
-                          <button class="threshold-frame153">
+                          <button id="light-medium-btn" class="threshold-frame153">
                             <span class="threshold-text32">
                               Medium(30% - 60%)
                             </span>
                           </button>
-                          <button class="threshold-frame163">
+                          <button id="light-hard-btn" class="threshold-frame163">
                             <span class="threshold-text33">
                               Hard(60% - 70%)
                             </span>
@@ -200,15 +203,15 @@
                       <span class="threshold-text35">Quick Set:</span>
                       <div class="threshold-humidity3">
                         <div class="threshold-soil-moisture4">
-                          <button class="threshold-frame144">
+                          <button id="humidity-low-btn" class="threshold-frame144">
                             <span class="threshold-text36">Low(0% - 30%)</span>
                           </button>
-                          <button class="threshold-frame154">
+                          <button id="humidity-medium-btn" class="threshold-frame154">
                             <span class="threshold-text37">
                               Medium(30% - 60%)
                             </span>
                           </button>
-                          <button class="threshold-frame164">
+                          <button id="humidity-hard-btn" class="threshold-frame164">
                             <span class="threshold-text38">
                               Hard(60% - 70%)
                             </span>
@@ -224,5 +227,6 @@
         </div>
       </div>
     </div>
+    <script src="{{ url_for('static', filename='threshold.js') }}"></script>
   </body>
 </html>

@@ -1,3 +1,17 @@
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/static/fonts/Satoshi-Regular.woff2') format('woff2');
+  font-weight: 400; /* atau normal */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/static/fonts/Satoshi-Black.woff2') format('woff2');
+  font-weight: 900; /* atau black */
+  font-style: normal;
+}
+
 .dashboard-container1 {
   width: 100%;
   display: flex;
@@ -415,11 +429,8 @@
 }
  
 .dashboard-aqindoor2 {
-  top: 8.583418846130371px;
-  left: 17.166837692260742px;
-  width: 69px;
-  height: 77px;
-  position: absolute;
+    width: 103px;
+    height: 103px;
 }
  
 .dashboard-text23 {
@@ -513,11 +524,8 @@
 }
  
 .dashboard-devicethermostat2 {
-  top: 8.583418846130371px;
-  left: 30.041837692260742px;
-  width: 43px;
-  height: 86px;
-  position: absolute;
+    width: 103px;
+    height: 103px;
 }
  
 .dashboard-text26 {
@@ -611,11 +619,8 @@
 }
  
 .dashboard-wbsunny2 {
-  top: 4.291581153869629px;
-  left: 4.291837692260742px;
-  width: 94px;
-  height: 94px;
-  position: absolute;
+    width: 103px;
+    height: 103px;
 }
  
 .dashboard-text29 {
@@ -887,11 +892,8 @@
 }
  
 .dashboard-wbincandescent2 {
-  top: 12.875px;
-  left: 8.583333015441895px;
-  width: 86px;
-  height: 82px;
-  position: absolute;
+    width: 103px;
+    height: 103px;
 }
  
 .dashboard-text36 {
@@ -909,24 +911,31 @@
 }
  
 .dashboard-frame20 {
-  gap: 13px;
+  gap: 50px;
   width: 197px;
   height: 91px;
   display: flex;
   z-index: 1;
   align-items: flex-start;
   flex-shrink: 0;
-  margin-left: var(--dl-layout-space-twounits);
 }
  
 
- 
-.dashboard-container4 {
+ .dashboard-container3 {
   flex: 0 0 auto;
   width: 92px;
   height: auto;
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+.dashboard-container4 {
+  gap: 10px;
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+  flex-shrink: 0;
+  justify-content: center;
 }
 .dashboard-data8 {
   width: 92px;
@@ -940,8 +949,34 @@
   flex-direction: column;
   background-color: rgba(103, 109, 120, 1);
 }
+.dashboard-data6 {
+
+  width: 92px;
+  height: 35px;
+  display: flex;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25) ;
+  margin-top: var(--dl-layout-space-oneunit);
+  align-items: flex-start;
+  flex-shrink: 0;
+  border-radius: 7px;
+  flex-direction: column;
+  background-color: rgba(103, 109, 120, 1);
+}
  
 .dashboard-text40 {
+  color: rgba(255, 255, 255, 1);
+  height: auto;
+  font-size: 18px;
+  align-self: stretch;
+  font-style: Black;
+  text-align: center;
+  font-family: Satoshi;
+  font-weight: 900;
+  line-height: normal;
+  font-stretch: normal;
+  text-decoration: none;
+}
+.dashboard-text38 {
   color: rgba(255, 255, 255, 1);
   height: auto;
   font-size: 18px;
@@ -985,19 +1020,11 @@
 .dashboard-cookie1 {
   width: 103px;
   height: 103px;
-  display: flex;
-  overflow: hidden;
-  position: relative;
-  align-items: flex-start;
-  flex-shrink: 1;
 }
  
 .dashboard-cookie2 {
-  top: 8.476040840148926px;
-  left: 8.583333015441895px;
-  width: 86px;
-  height: 86px;
-  position: absolute;
+    width: 103px;
+    height: 103px;
 }
  
 .dashboard-text41 {
@@ -1042,11 +1069,6 @@
   font-stretch: normal;
   text-decoration: none;
 }
-/* ======================================================= */
-/* == GAYA TAMBAHAN UNTUK TOMBOL AKTUATOR (VERSI LEBIH SPESIFIK) == */
-/* ======================================================= */
-
-/* Menggunakan selector yang lebih spesifik untuk memastikan gaya kita menang */
 .dashboard-actuator .dashboard-manual-water,
 .dashboard-actuator .dashboard-automatic-water,
 .dashboard-actuator .dashboard-data5,
@@ -1055,7 +1077,7 @@
 .dashboard-actuator .dashboard-data8,
 .dashboard-actuator .dashboard-data9
 {
-  cursor: pointer !important; /* !important adalah cara paksa, tapi kita coba tanpa ini dulu */
+  cursor: pointer !important;
   transition: background-color 0.2s ease-in-out, transform 0.1s ease;
 }
 
@@ -1085,4 +1107,50 @@
     background-color: #007bff !important; /* Warna biru cerah */
     color: white !important; /* Agar teks tetap terbaca */
     border: 1px solid #0056b3 !important;
+}
+
+.dashboard-card-container2 {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 40px;
+  padding: 24px;
+}
+
+.dashboard-soil-moisture,
+.dashboard-humidty,
+.dashboard-temperature {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  flex-basis: 272px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.dashboard-container2,
+.dashboard-frame20 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  margin-top: auto;
+  padding: 16px 0;
+}
+
+.dashboard-manual-water,
+.dashboard-automatic-water,
+.dashboard-data8,
+.dashboard-data6,
+.dashboard-data9 {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
