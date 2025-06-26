@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // button listeners
     document.getElementById('manual-water-btn')?.addEventListener('click', () => {
         console.log("Manual water activated, sending servo: ON");
-        sendControlCommand({ pump_trigger: 'ON' });
+        sendControlCommand({ pump_manual_trigger: 'ON' });
     });
 
     document.getElementById('feed-btn')?.addEventListener('click', () => {
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('auto-water-btn')?.addEventListener('click', () => {
-        const newState = currentControlState.auto_water_mode === 'ON' ? 'OFF' : 'ON';
+        const newState = currentControlState.auto_water_mode === 'AUTO' ? 'OFF' : 'AUTO';
         console.log(`Automatic water mode changed to: ${newState}`);
         sendControlCommand({ pump_mode: newState });
     });
