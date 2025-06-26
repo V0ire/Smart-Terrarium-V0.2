@@ -1,9 +1,10 @@
 {
-  "auto_water_mode": "OFF",
+  "pump_mode": "OFF",
   "humidity_threshold": 60,
   "lamp": "AUTO",
   "light_threshold": 50,
   "servo": "ON",
   "servo_threshold": 2,
-  "soil_threshold": 1800
+  "soil_threshold": 1800,
+  "pump_trigger": "OFF"
 }
