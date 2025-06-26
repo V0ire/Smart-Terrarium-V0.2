@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 updateButtonState('all-lamp-btn', currentControlState.lamp === 'ON');
                 updateButtonState('lamp-auto-btn', currentControlState.lamp === 'AUTO');
-                updateButtonState('auto-water-btn', currentControlState.auto_water_mode === 'ON');
+                updateButtonState('auto-water-btn', currentControlState.auto_water_mode === 'AUTO');
             })
             .catch(error => console.error('Error fetching status:', error));
     }
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('auto-water-btn')?.addEventListener('click', () => {
-        const newState = currentControlState.auto_water_mode === 'AUTO' ? 'OFF' : 'AUTO';
+        const newState = currentControlState.auto_water_mode === 'ON' ? 'OFF' : 'ON';
         console.log(`Automatic water mode changed to: ${newState}`);
         sendControlCommand({ pump_mode: newState });
     });
