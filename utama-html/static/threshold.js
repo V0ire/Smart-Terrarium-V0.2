@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Pengecekan untuk Soil Moisture Threshold
                 const soilThreshold = controls.soil_threshold || 2500;
                 let activeSoilBtnId = 'soil-medium-btn'; // Default
-                if (soilThreshold === 3000) activeSoilBtnId = 'soil-low-btn';
-                if (soilThreshold === 1800) activeSoilBtnId = 'soil-hard-btn';
+                if (soilThreshold === 2000) activeSoilBtnId = 'soil-low-btn';
+                if (soilThreshold === 3000) activeSoilBtnId = 'soil-hard-btn';
                 updateButtonGroup(['soil-low-btn', 'soil-medium-btn', 'soil-hard-btn'], activeSoilBtnId);
 
                 // Pengecekan untuk Isopods Feeding Threshold
